@@ -1,0 +1,13 @@
+### POST request to register a new patient
+POST http://localhost:4000/patients
+Content-Type: application/json
+
+{
+  "name": "Tanmay Kadam",
+  "email" : "tanmay@tanmay.com",
+  "address" : "address",
+  "dateOfBirth" : "2000-01-01",
+  "registeredDate" : "2000-01-01"
+}
+
+###
