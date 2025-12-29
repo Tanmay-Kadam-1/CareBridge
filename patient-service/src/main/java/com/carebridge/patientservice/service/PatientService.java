@@ -1,9 +1,11 @@
 package com.carebridge.patientservice.service;
 
+import billing.BillingResponse;
 import com.carebridge.patientservice.Exception.EmailAlreadyExistsException;
 import com.carebridge.patientservice.Exception.PatientNotFoundException;
 import com.carebridge.patientservice.dto.PatientRequestDTO;
 import com.carebridge.patientservice.dto.PatientResponseDTO;
+import com.carebridge.patientservice.grpc.BillingServiceGrpcClient;
 import com.carebridge.patientservice.mapper.PatientMapper;
 import com.carebridge.patientservice.model.Patient;
 import com.carebridge.patientservice.repository.PatientRepository;
@@ -17,11 +19,14 @@ import java.util.UUID;
 @Service
 public class PatientService {
 
-    private PatientRepository patientRepository;
+    private final PatientRepository patientRepository;
 
-    public PatientService(PatientRepository patientRepository)
+    private final BillingServiceGrpcClient billingServiceGrpcClient;
+
+    public PatientService(PatientRepository patientRepository, BillingServiceGrpcClient billingServiceGrpcClient)
     {
         this.patientRepository = patientRepository;
+        this.billingServiceGrpcClient = billingServiceGrpcClient;
     }
 
     public List<PatientResponseDTO> getPatients()
@@ -39,6 +44,9 @@ public class PatientService {
         if(patientRepository.existsByEmail(patientRequestDTO.getEmail())) throw new EmailAlreadyExistsException("This Email address is already registered for another Patient" + patientRequestDTO.getEmail());
 
         Patient patientNew  = patientRepository.save( PatientMapper.toModel(patientRequestDTO) );
+
+        billingServiceGrpcClient.createBillingAccount(patientNew.getId().toString(),patientNew.getName(),patientNew.getEmail());
+
         return PatientMapper.toDTO(patientNew);
     }
 
