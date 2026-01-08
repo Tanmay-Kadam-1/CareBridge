@@ -1,4 +1,3 @@
-version: "3.9"
 
 services:
 
@@ -12,7 +11,37 @@ services:
       POSTGRES_PASSWORD: ${AUTH_DB_PASSWORD}
     ports:
       - "${AUTH_DB_PORT}:5432"
+    networks:
+      - internal
     volumes:
-      - "/Users/tanmaykadam/Tanmay Projects/Docker/db_volumes/auth-service-db:/var/lib/postgresql"
+      # Named volume for DB, delete before each run for fresh DB
+      - auth-service-db-data:/var/lib/postgresql/data
 
-# No named volumes needed if you use host paths
+  auth-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      # Force rebuild ignoring cache
+      cache_from: []
+    container_name: auth-service
+    ports:
+      - "4005:4005"
+    environment:
+      SERVER_PORT: ${AUTH_SERVICE_SERVER_PORT}
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: ${SPRING_JPA_HIBERNATE_DDL_AUTO}
+      SPRING_SQL_INIT_MODE: ${SPRING_SQL_INIT_MODE}
+      JWT_SECRET: ${JWT_SECRET}
+    networks:
+      - internal
+    depends_on:
+      - auth-service-db
+
+networks:
+  internal:
+
+volumes:
+  # Named volume for database
+  auth-service-db-data:
