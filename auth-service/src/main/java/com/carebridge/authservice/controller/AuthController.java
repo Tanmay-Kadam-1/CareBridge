@@ -53,7 +53,6 @@ public class AuthController {
     public ResponseEntity<RegisterResponseDTO> register(
             @RequestBody RegisterRequestDTO request)
     {
-        System.out.println("HELOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
         Optional<User> createdUser =
                 userService.createUser(
                         request.getEmail(),
